@@ -1,14 +1,16 @@
 import pickle
 import pandas as pd
+import numpy as np
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import StratifiedKFold, cross_validate
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import util.const as const
+import util.features as features
 
 class Model():
     '''
@@ -41,10 +43,11 @@ class Model():
             self.test_dataset = df_test['text'].values.astype('U')
             self.test_categories = df_test['humor'].values
 
-    # Tokenize texts for input to model
-    def tokenize_dataset(self):
-        self.vectorizer = CountVectorizer()
-        self.dataset = self.vectorizer.fit_transform(self.dataset).toarray()
+    # Vectorize exts for input to model
+    def vectorize_dataset(self):
+        self.vectorizer = DictVectorizer()
+        self.dataset = features.get_features(self.dataset)
+        self.dataset = self.vectorizer.fit_transform(self.dataset)
 
     # Aux function - For saving classifier
     def save(self):
@@ -79,8 +82,8 @@ class Model():
         # Read dataset and categories
         self.read_dataset()
 
-        # Tokenize dataset and save vectorizer
-        self.tokenize_dataset()
+        # Vectorize dataset and save vectorizer
+        self.vectorize_dataset()
 
     # Create and train classifier depending on chosen model
     def train(self):
@@ -100,6 +103,7 @@ class Model():
 
     # Predict classification for X using classifier
     def predict(self, X):
+        X = features.get_features(X)
 
         # Vectorize text
         examples = self.vectorizer.transform(X).toarray()
