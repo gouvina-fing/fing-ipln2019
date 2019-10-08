@@ -1,15 +1,17 @@
 import pickle
 import pandas as pd
+import numpy as np
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import StratifiedKFold, cross_validate
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from vectorization.vectorizer import Vectorizer
 import util.const as const
+import util.features as features
 
 class Model():
     '''
@@ -46,6 +48,12 @@ class Model():
     def vectorize_dataset(self):
         self.vectorizer = Vectorizer(self.vectorization)
         self.dataset = self.vectorizer.fit(self.dataset)
+
+    # Vectorize exts for input to model
+    #def vectorize_dataset(self):
+    #    self.vectorizer = DictVectorizer()
+    #    self.dataset = features.get_features(self.dataset)
+    #    self.dataset = self.vectorizer.fit_transform(self.dataset)
 
     # Aux function - For saving classifier
     def save(self):
@@ -104,6 +112,7 @@ class Model():
 
     # Predict classification for X using classifier
     def predict(self, X):
+        X = features.get_features(X)
 
         # Vectorize text
         examples = self.vectorizer.transform(X)
