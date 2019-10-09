@@ -1,5 +1,10 @@
 import re
+import math
 import numpy as np
+
+def read_dictionary(filename):
+    with open(filename) as dictionary:
+        return {word.rstrip('\n') for word in dictionary if word.rstrip('\n')}
 
 # CONSTANTS
 
@@ -19,14 +24,15 @@ question_answer_regex = re.compile(
     """, re.VERBOSE
 )
 
+keywords = read_dictionary('src/util/dictionaries/keywords.dic')
+
+hasthag_regex = re.compile(r'(\B#\w+)')
+
 #multiple_spaces_regex = re.compile(r' +')
 
 #retweet_regex = re.compile(r'^RT @\w+: ')
 
-#hasthag_regex = re.compile(r'(\B#\w+)')
-
 #tag_regex = re.compile(r'(\B@\w+)')
-
 
 # MAIN FUNCTIONS
 def get_features(tweets):
@@ -41,8 +47,12 @@ def extract_features(tweet):
     features['contains_dialogue'] = contains_dialogue(tweet)
     features['number_of_urls'] = number_of_urls(tweet)
     features['number_of_question_answers'] = number_of_question_answers(tweet)
-
+    features['number_of_keywords'] = number_of_keywords(tweet)
+    features['number_of_hashtags'] = number_of_hashtags(tweet)
+    
     return features
+
+############################
 
 # 
 def contains_dialogue(tweet):
@@ -59,3 +69,17 @@ def number_of_urls(tweet):
 def number_of_question_answers(tweet):
     # return len(re.findall(question_answer_regex, tweet))
     return question_answer_regex.subn('', tweet)[1]
+
+def number_of_keywords(tweet):
+    number_of_occurrences = 0
+    words = tweet.split(' ')
+    for word in words:
+        if word in keywords:
+            number_of_occurrences += 1
+    return number_of_occurrences / math.sqrt(len(words))
+
+def number_of_hashtags(tweet):
+    return len(re.findall(hasthag_regex, tweet))
+
+############################
+

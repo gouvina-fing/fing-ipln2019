@@ -93,6 +93,7 @@ class Model():
             self.classifier = DecisionTreeClassifier(max_depth=5)
         if self.model == 'nb':
             self.classifier = GaussianNB()
+            self.dataset = self.dataset.todense()
         if self.model == 'knn':
             self.classifier = KNeighborsClassifier(5)
         elif self.model == 'mlp_classifier':

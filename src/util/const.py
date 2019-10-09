@@ -25,5 +25,4 @@ EVALUATIONS = {
 # MODEL
 # ---------------------------------------------------------------
 
-#MODELS = ['svm', 'tree', 'nb', 'knn', 'mlp_classifier']
-MODELS = ['svm', 'tree', 'knn', 'mlp_classifier']
+MODELS = ['svm', 'tree', 'nb', 'knn', 'mlp_classifier']
