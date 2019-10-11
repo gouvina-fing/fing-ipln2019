@@ -25,7 +25,7 @@ question_answer_regex = re.compile(
 )
 
 word_or_number_regex = re.compile(r'\b\w+\b')
-capslock_word_regex = re.compile(r'\b[0-9A-Z_]+\b')
+capslock_word_regex = re.compile(r'\b[A-Z_]+\b')
 
 keywords = read_dictionary('src/util/dictionaries/keywords.dic')
 keywords = [x.lower() for x in keywords]
@@ -38,7 +38,7 @@ animals = [x.lower() for x in animals]
 
 hasthag_regex = re.compile(r'(\B#\w+)')
 
-exclamation_regex = re.compile(r'(¡\w*!|!\s+)')
+exclamation_regex = re.compile(r'(\b¡\w*!\b|!\b)')
 
 # MAIN FUNCTIONS
 def get_features(tweets):
@@ -47,8 +47,8 @@ def get_features(tweets):
 # AUXILIARY FUNCTIONS
 
 def extract_features(tweet):
-    # Eliminate linebreaks
-    tweet = re.sub('\n', ' ', tweet)
+    # Eliminate leading whitespaces and convert every other whitespace other to " "
+    tweet = re.sub('[\t\n\r\f\v]+', ' ', tweet).strip()
 
     downcased_tweet = tweet.lower()
 
@@ -61,9 +61,9 @@ def extract_features(tweet):
     features['number_of_hashtags'] = number_of_regex_occurrences(hasthag_regex, tweet)
     features['number_of_question_answers'] = number_of_regex_occurrences(question_answer_regex, tweet)
 
-    features['number_of_keywords'] = number_of_word_ocurrences(keywords, tweet)
-    features['number_of_animals'] = number_of_word_ocurrences(animals, tweet)
-    features['number_of_sexual_words'] = number_of_word_ocurrences(sexual_words, tweet)
+    features['number_of_keywords'] = ratio_of_word_ocurrences(keywords, tweet)
+    features['number_of_animals'] = ratio_of_word_ocurrences(animals, tweet)
+    features['number_of_sexual_words'] = ratio_of_word_ocurrences(sexual_words, tweet)
 
     features['capslock_ratio'] = capslock_ratio(tweet)
     
@@ -83,12 +83,12 @@ def number_of_regex_occurrences(regex, tweet):
     return len(re.findall(regex, tweet))
 
 # Counts the number of occurrences of a specific list in the tweet
-def number_of_word_ocurrences(words, tweet):
+def ratio_of_word_ocurrences(word_dictionary, tweet):
     number_of_occurrences = 0
     tweet = tweet.lower()
     words = tweet.split(' ')
     for word in words:
-        if word in words:
+        if word in word_dictionary:
             number_of_occurrences += 1
     return number_of_occurrences / math.sqrt(len(words))
 
