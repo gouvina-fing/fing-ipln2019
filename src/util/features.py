@@ -24,62 +24,80 @@ question_answer_regex = re.compile(
     """, re.VERBOSE
 )
 
+word_or_number_regex = re.compile(r'\b\w+\b')
+capslock_word_regex = re.compile(r'\b[0-9A-Z_]+\b')
+
 keywords = read_dictionary('src/util/dictionaries/keywords.dic')
+keywords = [x.lower() for x in keywords]
+
+sexual_words = read_dictionary('src/util/dictionaries/sexual.dic')
+sexual_words = [x.lower() for x in sexual_words]
+
+animals = read_dictionary('src/util/dictionaries/animales.dic')
+animals = [x.lower() for x in animals]
 
 hasthag_regex = re.compile(r'(\B#\w+)')
 
-#multiple_spaces_regex = re.compile(r' +')
-
-#retweet_regex = re.compile(r'^RT @\w+: ')
-
-#tag_regex = re.compile(r'(\B@\w+)')
+exclamation_regex = re.compile(r'(¡\w*!|!\s+)')
 
 # MAIN FUNCTIONS
 def get_features(tweets):
     return np.vectorize(extract_features)(tweets)
-    #return (lambda tweet: extract_features(tweet))(tweets)
 
 # AUXILIARY FUNCTIONS
 
 def extract_features(tweet):
+    # Eliminate linebreaks
+    tweet = re.sub('\n', ' ', tweet)
+
+    downcased_tweet = tweet.lower()
+
     features = {}
 
-    features['contains_dialogue'] = contains_dialogue(tweet)
-    features['number_of_urls'] = number_of_urls(tweet)
-    features['number_of_question_answers'] = number_of_question_answers(tweet)
-    features['number_of_keywords'] = number_of_keywords(tweet)
-    features['number_of_hashtags'] = number_of_hashtags(tweet)
+    features['starts_with_dialogue'] = starts_with_dialogue(tweet)
+
+    features['number_of_urls'] = number_of_regex_occurrences(url_regex, tweet)
+    features['number_of_exclamations'] = number_of_regex_occurrences(exclamation_regex, tweet)
+    features['number_of_hashtags'] = number_of_regex_occurrences(hasthag_regex, tweet)
+    features['number_of_question_answers'] = number_of_regex_occurrences(question_answer_regex, tweet)
+
+    features['number_of_keywords'] = number_of_word_ocurrences(keywords, tweet)
+    features['number_of_animals'] = number_of_word_ocurrences(animals, tweet)
+    features['number_of_sexual_words'] = number_of_word_ocurrences(sexual_words, tweet)
+
+    features['capslock_ratio'] = capslock_ratio(tweet)
     
     return features
 
 ############################
 
-# 
-def contains_dialogue(tweet):
+# Determines if tweet starts with any dialogue symbol
+def starts_with_dialogue(tweet):
     for punctuation in dialogue_punctuation:
         if tweet.startswith(punctuation):
             return 1
     return 0
 
-# 
-def number_of_urls(tweet):
-    return len(re.findall(url_regex, tweet))
+# Counts the number of groups when finding by a specific regex in the tweet
+def number_of_regex_occurrences(regex, tweet):
+    return len(re.findall(regex, tweet))
 
-#
-def number_of_question_answers(tweet):
-    # return len(re.findall(question_answer_regex, tweet))
-    return question_answer_regex.subn('', tweet)[1]
-
-def number_of_keywords(tweet):
+# Counts the number of occurrences of a specific list in the tweet
+def number_of_word_ocurrences(words, tweet):
     number_of_occurrences = 0
+    tweet = tweet.lower()
     words = tweet.split(' ')
     for word in words:
-        if word in keywords:
+        if word in words:
             number_of_occurrences += 1
     return number_of_occurrences / math.sqrt(len(words))
 
-def number_of_hashtags(tweet):
-    return len(re.findall(hasthag_regex, tweet))
+# Cuenta la cantidad de palabras totalmente en mayúsculas, dividido la cantidad de palabras del tweet.
+def capslock_ratio(tweet):
+    number_of_word_or_numbers = len(re.findall(word_or_number_regex, tweet))
+    number_of_capslock_words = len(re.findall(capslock_word_regex, tweet))
 
-############################
-
+    if number_of_word_or_numbers == 0:
+        return 0
+    else:
+        return number_of_capslock_words / number_of_word_or_numbers
