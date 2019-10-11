@@ -56,6 +56,12 @@ class Model():
     #    self.dataset = features.get_features(self.dataset)
     #    self.dataset = self.vectorizer.fit_transform(self.dataset)
 
+    # Vectorize exts for input to model
+    def vectorize_dataset(self):
+        self.vectorizer = DictVectorizer()
+        self.dataset = features.get_features(self.dataset)
+        self.dataset = self.vectorizer.fit_transform(self.dataset)
+
     # Aux function - For saving classifier
     def save(self):
         pickle.dump(self.classifier, open(const.MODEL_FOLDER + const.MODEL_FILE, 'wb'))
