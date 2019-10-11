@@ -8,6 +8,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from vectorization.vectorizer import Vectorizer
 import util.const as const
 
 class Model():
@@ -41,10 +42,10 @@ class Model():
             self.test_dataset = df_test['text'].values.astype('U')
             self.test_categories = df_test['humor'].values
 
-    # Tokenize texts for input to model
-    def tokenize_dataset(self):
-        self.vectorizer = CountVectorizer()
-        self.dataset = self.vectorizer.fit_transform(self.dataset).toarray()
+    # Vectorize texts for input to model
+    def vectorize_dataset(self):
+        self.vectorizer = Vectorizer(self.vectorization)
+        self.dataset = self.vectorizer.fit(self.dataset)
 
     # Aux function - For saving classifier
     def save(self):
@@ -55,7 +56,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
+    def __init__(self, vectorization=const.VECTORIZERS['one_hot'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
 
         # Create empty dataset for training
         self.dataset = None
@@ -68,19 +69,22 @@ class Model():
         # Create other empty objects
         self.classifier = None
         self.vectorizer = None
-        self.model = model
 
+        # Create other configuration values
+        self.model = model
+        self.vectorization = vectorization
+        self.evaluation = evaluation
+        
         # Generate default values
         self.threshold = 0.5
-        self.evaluation = evaluation
         self.evaluation_normal_size = 0.2
         self.evaluation_cross_k = StratifiedKFold(10, True)
 
         # Read dataset and categories
         self.read_dataset()
 
-        # Tokenize dataset and save vectorizer
-        self.tokenize_dataset()
+        # Vectorize dataset and save vectorizer
+        self.vectorize_dataset()
 
     # Create and train classifier depending on chosen model
     def train(self):
@@ -102,7 +106,7 @@ class Model():
     def predict(self, X):
 
         # Vectorize text
-        examples = self.vectorizer.transform(X).toarray()
+        examples = self.vectorizer.transform(X)
 
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)
