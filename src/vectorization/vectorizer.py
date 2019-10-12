@@ -1,7 +1,7 @@
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
-import vectorization.features_vectorizer
-import vectorization.embeddings_vectorizer
+import vectorization.features_vectorizer as features_vectorizer
+import vectorization.embeddings_vectorizer  as embeddings_vectorizer
 import util.const as const
 
 class Vectorizer():
@@ -39,7 +39,7 @@ class Vectorizer():
         # If vectorization is by features, uses feature extraction and DictVectorizer
         if self.type == const.VECTORIZERS['features']:
             featurized = features_vectorizer.get_features(X)
-            vectorized = self.vectorizer.fit_transform(X).toarray()
+            vectorized = self.vectorizer.fit_transform(featurized)
 
         # If vectorization is by word embeddings, uses word embeddings dictionary and mean
         if self.type == const.VECTORIZERS['word_embeddings']:
@@ -59,7 +59,7 @@ class Vectorizer():
         # If vectorization is by features, uses feature extraction and DictVectorizer        
         if self.type == const.VECTORIZERS['features']:
             featurized = features_vectorizer.get_features(X)
-            vectorized = self.vectorizer.transform(X).toarray()
+            vectorized = self.vectorizer.transform(featurized)
 
         # If vectorization is by word embeddings, uses word embeddings dictionary and mean        
         if self.type == const.VECTORIZERS['word_embeddings']:

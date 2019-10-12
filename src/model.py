@@ -12,7 +12,6 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from vectorization.vectorizer import Vectorizer
 import util.const as const
-import util.features as features
 
 class Model():
     '''
@@ -50,18 +49,6 @@ class Model():
         self.vectorizer = Vectorizer(self.vectorization)
         self.dataset = self.vectorizer.fit(self.dataset)
 
-    # Vectorize exts for input to model
-    #def vectorize_dataset(self):
-    #    self.vectorizer = DictVectorizer()
-    #    self.dataset = features.get_features(self.dataset)
-    #    self.dataset = self.vectorizer.fit_transform(self.dataset)
-
-    # Vectorize exts for input to model
-    def vectorize_dataset(self):
-        self.vectorizer = DictVectorizer()
-        self.dataset = features.get_features(self.dataset)
-        self.dataset = self.vectorizer.fit_transform(self.dataset)
-
     # Aux function - For saving classifier
     def save(self):
         pickle.dump(self.classifier, open(const.MODEL_FOLDER + const.MODEL_FILE, 'wb'))
@@ -71,7 +58,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['one_hot'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
 
         # Create empty dataset for training
         self.dataset = None
@@ -120,10 +107,11 @@ class Model():
 
     # Predict classification for X using classifier
     def predict(self, X):
-        X = features.get_features(X)
-
         # Vectorize text
         examples = self.vectorizer.transform(X)
+
+        if self.model == 'nb' and vectorization == const.VECTORIZERS['features']:
+            examples = examples.todense()
 
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)
