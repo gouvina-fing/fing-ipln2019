@@ -57,7 +57,11 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
+<<<<<<< HEAD
 set -gx VIRTUAL_ENV "/home/ramiro/Desktop/IPLN2019/ipln2019/env35"
+=======
+set -gx VIRTUAL_ENV "/home/ramiro/Desktop/ipln2019/env35"
+>>>>>>> features_corrector
 
 # https://github.com/fish-shell/fish-shell/issues/436 altered PATH handling
 if test (echo $FISH_VERSION | tr "." "\n")[1] -lt 3

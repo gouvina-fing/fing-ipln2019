@@ -1,13 +1,9 @@
-<<<<<<< HEAD
-#!/home/ramiro/Desktop/IPLN2019/ipln2019/env35/bin/python3.7
-=======
 #!/home/ramiro/Desktop/ipln2019/env35/bin/python3.7
->>>>>>> features_corrector
 # -*- coding: utf-8 -*-
 import re
 import sys
 
-from setuptools.command.easy_install import main
+from pyupgrade import main
 
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])

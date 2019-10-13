@@ -28,7 +28,11 @@ def _deactivate(args):
 _deactivate(["nondestructive"])
 aliases["deactivate"] = _deactivate
 
+<<<<<<< HEAD
 $VIRTUAL_ENV = r"/home/ramiro/Desktop/IPLN2019/ipln2019/env35"
+=======
+$VIRTUAL_ENV = r"/home/ramiro/Desktop/ipln2019/env35"
+>>>>>>> features_corrector
 
 $_OLD_VIRTUAL_PATH = $PATH
 $PATH = $PATH[:]

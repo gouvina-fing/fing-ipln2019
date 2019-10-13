@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #!/home/ramiro/Desktop/IPLN2019/ipln2019/env35/bin/python
+=======
+#!/home/ramiro/Desktop/ipln2019/env35/bin/python
+>>>>>>> features_corrector
 
 import sys
 import getopt

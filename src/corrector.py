@@ -1,6 +1,5 @@
 import re
 from collections import Counter
-from processWordEmbeddings import tokenize_text
 
 def words(text): return re.findall(r'\w+', text.lower())
 
@@ -36,16 +35,5 @@ def edits2(word):
     "All edits that are two edits away from `word`."
     return (e2 for e1 in edits1(word) for e2 in edits1(e1))
 
-def correctTweet(TweetArr):
-    i = 0
-    while i < len(TweetArr):
-        TweetArr[i] = correction(TweetArr[i])
-        i += 1
-    return TweetArr
-
-<<<<<<< HEAD
-
 if __name__ == "__main__":
-    print(correctTweet(["El","Peto", "y", "ti", "MaRa"]))
-=======
->>>>>>> features_corrector
+    print(correction("Whatsapp"))
