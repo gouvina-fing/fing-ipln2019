@@ -38,14 +38,22 @@ def edits2(word):
 
 def correctTweet(TweetArr):
     i = 0
+    needUpper = False
     while i < len(TweetArr):
-        TweetArr[i] = correction(TweetArr[i])
+        corregida = correction(TweetArr[i])
+        j=0
+        aux = ""
+        while j < len(corregida):
+            if j < len(TweetArr[i]):
+                if not TweetArr[i][j].islower():
+                    aux += corregida[j].upper()
+                else:
+                    aux += corregida[j]
+            j +=1
+        TweetArr[i] = aux
         i += 1
     return TweetArr
 
-<<<<<<< HEAD
-
 if __name__ == "__main__":
-    print(correctTweet(["El","Peto", "y", "ti", "MaRa"]))
-=======
->>>>>>> features_corrector
+    print(correctTweet(["El","perro", "y", "tu", "mama"]))
+
