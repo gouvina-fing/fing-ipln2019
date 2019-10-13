@@ -1,5 +1,6 @@
 import pickle
 import pandas as pd
+import numpy as np
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -9,6 +10,7 @@ from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import util.const as const
+import util.processWordEmbeddings as pWorEmb
 
 class Model():
     '''
@@ -45,6 +47,34 @@ class Model():
     def tokenize_dataset(self):
         self.vectorizer = CountVectorizer()
         self.dataset = self.vectorizer.fit_transform(self.dataset).toarray()
+    
+    # Load embeddings.csv
+    def load_embeddings(self):
+        self.embeddings = pWorEmb.load_embeddings()
+
+    # Transform the dataset of tweets into its mean vector of embeddings asociated 
+    def dataset_embedded(self):
+        self.load_embeddings()
+        res = np.array([np.zeros(300)])
+        for tweet in self.dataset:
+            e = pWorEmb.convert_tweet_to_embedding(tweet, self.embeddings)
+            res = np.concatenate((res,[e]))
+        res = res[1:]
+        self.dataset = res
+        
+        #self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
+    
+        '''
+        try:
+            # self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
+            res = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
+        except BaseException as  error:
+            print('hubo un error')
+            # import pdb; pdb.set_trace()
+
+            print(str(error))
+
+        '''
 
     # Aux function - For saving classifier
     def save(self):
@@ -80,7 +110,7 @@ class Model():
         self.read_dataset()
 
         # Tokenize dataset and save vectorizer
-        self.tokenize_dataset()
+        self.dataset_embedded()
 
     # Create and train classifier depending on chosen model
     def train(self):
@@ -96,6 +126,7 @@ class Model():
             self.classifier = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=2000, solver='sgd')
 
         # Train using dataset
+        import pdb; pdb.set_trace()
         self.classifier.fit(self.dataset, self.categories)
 
     # Predict classification for X using classifier
