@@ -1,5 +1,6 @@
 import pickle
 import pandas as pd
+import numpy as np
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
@@ -7,6 +8,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from vectorization.vectorizer import Vectorizer
 import util.const as const
@@ -56,7 +58,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['one_hot'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
 
         # Create empty dataset for training
         self.dataset = None
@@ -94,6 +96,7 @@ class Model():
             self.classifier = DecisionTreeClassifier(max_depth=5)
         if self.model == 'nb':
             self.classifier = GaussianNB()
+            self.dataset = self.dataset.todense()
         if self.model == 'knn':
             self.classifier = KNeighborsClassifier(5)
         elif self.model == 'mlp_classifier':
@@ -104,9 +107,11 @@ class Model():
 
     # Predict classification for X using classifier
     def predict(self, X):
-
         # Vectorize text
         examples = self.vectorizer.transform(X)
+
+        if self.model == 'nb' and vectorization == const.VECTORIZERS['features']:
+            examples = examples.todense()
 
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)
