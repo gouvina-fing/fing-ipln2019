@@ -118,7 +118,7 @@ class Model():
             if self.model == 'nb':
                 parameter_space = [
                     {
-                        'alpha': [1.0, 0.5, 0.1, 0.01, 0]
+                        'alpha': [2.0, 1.0, 0.5, 0]
                     }
                 ]
                 self.classifier = GridSearchCV(MultinomialNB(), parameter_space, cv=3, n_jobs=-1)
