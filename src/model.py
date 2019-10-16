@@ -56,6 +56,19 @@ class Model():
     def dataset_embedded(self):
         self.load_embeddings()
         res = np.array([np.zeros(300)])
+        '''
+        self.dataset =  np.array(self.dataset, dtype=object)
+        for i, tweet in enumerate(self.dataset):
+            try: 
+                self.dataset[i] = np.array(pWorEmb.convert_tweet_to_embedding(tweet, self.embeddings), dtype=object)
+            except:
+                import pdb; pdb.set_trace()
+                print('errror')
+        print('FIN 1')
+
+        import pdb; pdb.set_trace()
+        print('FIN')
+        '''    
         for tweet in self.dataset:
             e = pWorEmb.convert_tweet_to_embedding(tweet, self.embeddings)
             res = np.concatenate((res,[e]))
@@ -63,7 +76,9 @@ class Model():
         self.dataset = res
         
         #self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
-    
+
+        '''
+        '''
         '''
         try:
             # self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
@@ -75,6 +90,10 @@ class Model():
             print(str(error))
 
         '''
+        # Vectorize texts for input to model
+    def vectorize_dataset(self):
+        self.vectorizer = Vectorizer(self.vectorization)
+        self.dataset = self.vectorizer.fit(self.dataset)
 
     # Aux function - For saving classifier
     def save(self):
@@ -126,14 +145,13 @@ class Model():
             self.classifier = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=2000, solver='sgd')
 
         # Train using dataset
-        import pdb; pdb.set_trace()
         self.classifier.fit(self.dataset, self.categories)
 
     # Predict classification for X using classifier
     def predict(self, X):
 
         # Vectorize text
-        examples = self.vectorizer.transform(X).toarray()
+        examples = self.vectorizer.transform(X)
 
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)
