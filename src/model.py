@@ -8,7 +8,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import StratifiedKFold, cross_validate
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from vectorization.vectorizer import Vectorizer
 import util.const as const
 import util.processWordEmbeddings as pWorEmb
 
@@ -57,6 +59,8 @@ class Model():
         self.load_embeddings()
         res = np.array([np.zeros(300)])
         '''
+        SI USO ESTE METODO EXPLOTA EN EL FIT
+
         self.dataset =  np.array(self.dataset, dtype=object)
         for i, tweet in enumerate(self.dataset):
             try: 
@@ -64,10 +68,7 @@ class Model():
             except:
                 import pdb; pdb.set_trace()
                 print('errror')
-        print('FIN 1')
-
-        import pdb; pdb.set_trace()
-        print('FIN')
+        
         '''    
         for tweet in self.dataset:
             e = pWorEmb.convert_tweet_to_embedding(tweet, self.embeddings)
@@ -77,20 +78,8 @@ class Model():
         
         #self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
 
-        '''
-        '''
-        '''
-        try:
-            # self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
-            res = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
-        except BaseException as  error:
-            print('hubo un error')
-            # import pdb; pdb.set_trace()
 
-            print(str(error))
-
-        '''
-        # Vectorize texts for input to model
+    # Vectorize texts for input to model
     def vectorize_dataset(self):
         self.vectorizer = Vectorizer(self.vectorization)
         self.dataset = self.vectorizer.fit(self.dataset)
@@ -104,7 +93,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
 
         # Create empty dataset for training
         self.dataset = None
@@ -117,11 +106,14 @@ class Model():
         # Create other empty objects
         self.classifier = None
         self.vectorizer = None
-        self.model = model
 
+        # Create other configuration values
+        self.model = model
+        self.vectorization = vectorization
+        self.evaluation = evaluation
+        
         # Generate default values
         self.threshold = 0.5
-        self.evaluation = evaluation
         self.evaluation_normal_size = 0.2
         self.evaluation_cross_k = StratifiedKFold(10, True)
 
@@ -130,6 +122,8 @@ class Model():
 
         # Tokenize dataset and save vectorizer
         self.dataset_embedded()
+        # Vectorize dataset and save vectorizer
+      #  self.vectorize_dataset()
 
     # Create and train classifier depending on chosen model
     def train(self):
@@ -139,6 +133,7 @@ class Model():
             self.classifier = DecisionTreeClassifier(max_depth=5)
         if self.model == 'nb':
             self.classifier = GaussianNB()
+            self.dataset = self.dataset.todense()
         if self.model == 'knn':
             self.classifier = KNeighborsClassifier(5)
         elif self.model == 'mlp_classifier':
@@ -149,9 +144,11 @@ class Model():
 
     # Predict classification for X using classifier
     def predict(self, X):
-
         # Vectorize text
         examples = self.vectorizer.transform(X)
+
+        if self.model == 'nb' and vectorization == const.VECTORIZERS['features']:
+            examples = examples.todense()
 
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)

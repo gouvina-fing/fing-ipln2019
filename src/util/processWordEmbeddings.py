@@ -34,14 +34,13 @@ def convert_tweet_to_embedding(tweet, embeddings):
 
 def tokenize_text(text):
 
-    # Eliminate symbols
+    # Eliminate symbols --- SE PUEDE USAR UNA ER
     symbols = ['.',',','_',';','"','\n',"'",'!',':','?']
     for symbol in symbols:
         text = text.replace(symbol, ' ')
 
     # Tokenize
     words = [ token.txt for token in tokenize(text) if  token.txt is not None]
-
     return words
 
 
