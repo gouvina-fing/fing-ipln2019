@@ -2,6 +2,7 @@ import sys
 import pandas as pd
 import numpy as np
 import statistics
+import re
 import util.const as const
 from tokenizer import tokenize
 
@@ -38,6 +39,9 @@ def tokenize_text(text):
     symbols = ['.',',','_',';','"','\n',"'",'!',':','?']
     for symbol in symbols:
         text = text.replace(symbol, ' ')
+    regex = r"¡|!|,|\?|\.|=|\+|-|_|&|\^|%|$|#|@|\(|\)|`|'|<|>|/|:|;|\*|$|¿|\[|\]|\{|\}|~"
+    text = re.sub(regex, ' ', text)
+
 
     # Tokenize
     words = [ token.txt for token in tokenize(text) if  token.txt is not None]

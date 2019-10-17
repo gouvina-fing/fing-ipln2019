@@ -12,7 +12,6 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 from vectorization.vectorizer import Vectorizer
 import util.const as const
-import util.processWordEmbeddings as pWorEmb
 
 class Model():
     '''
@@ -45,40 +44,6 @@ class Model():
             self.test_dataset = df_test['text'].values.astype('U')
             self.test_categories = df_test['humor'].values
 
-    # Tokenize texts for input to model
-    def tokenize_dataset(self):
-        self.vectorizer = CountVectorizer()
-        self.dataset = self.vectorizer.fit_transform(self.dataset).toarray()
-    
-    # Load embeddings.csv
-    def load_embeddings(self):
-        self.embeddings = pWorEmb.load_embeddings()
-
-    # Transform the dataset of tweets into its mean vector of embeddings asociated 
-    def dataset_embedded(self):
-        self.load_embeddings()
-        res = np.array([np.zeros(300)])
-        '''
-        SI USO ESTE METODO EXPLOTA EN EL FIT
-
-        self.dataset =  np.array(self.dataset, dtype=object)
-        for i, tweet in enumerate(self.dataset):
-            try: 
-                self.dataset[i] = np.array(pWorEmb.convert_tweet_to_embedding(tweet, self.embeddings), dtype=object)
-            except:
-                import pdb; pdb.set_trace()
-                print('errror')
-        
-        '''    
-        for tweet in self.dataset:
-            e = pWorEmb.convert_tweet_to_embedding(tweet, self.embeddings)
-            res = np.concatenate((res,[e]))
-        res = res[1:]
-        self.dataset = res
-        
-        #self.dataset = np.vectorize(pWorEmb.convert_tweet_to_embedding)(self.dataset,self.embeddings)
-
-
     # Vectorize texts for input to model
     def vectorize_dataset(self):
         self.vectorizer = Vectorizer(self.vectorization)
@@ -93,7 +58,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
+    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
 
         # Create empty dataset for training
         self.dataset = None
@@ -120,10 +85,8 @@ class Model():
         # Read dataset and categories
         self.read_dataset()
 
-        # Tokenize dataset and save vectorizer
-        self.dataset_embedded()
         # Vectorize dataset and save vectorizer
-      #  self.vectorize_dataset()
+        self.vectorize_dataset()
 
     # Create and train classifier depending on chosen model
     def train(self):
