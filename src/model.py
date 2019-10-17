@@ -98,12 +98,12 @@ class Model():
                         'probability': [True],
                         'kernel': ['rbf'],
                         'gamma': ['auto', 1e-3, 1e-4],
-                        'C': [1, 10, 100, 1000]
+                        'C': [1, 10, 100]
                     },
                     {
                         'probability': [True],
                         'kernel': ['linear'],
-                        'C': [1, 10, 100, 1000]
+                        'C': [1, 10, 100]
                     }
                 ]
                 self.classifier = GridSearchCV(SVC(), parameter_space, cv=3, n_jobs=-1)
