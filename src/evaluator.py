@@ -5,7 +5,7 @@ from model import Model
 # MAIN FUNCTIONS
 
 # Train a model and evaluate its performance
-def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal']):
+def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal'], main_grid_search=False):
 
     # Hard evaluation: Sort models by results and train the one with better results
     if hard_evaluation:
@@ -18,7 +18,7 @@ def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal']):
             print('(EVALUATOR) Evaluating model ' + model_type)
 
             # 1. Create model
-            model = Model(model=model_type, evaluation=evaluation)
+            model = Model(model=model_type, evaluation=evaluation, grid_search=main_grid_search)
 
             # 2. Train classifier
             model.train()
@@ -57,7 +57,7 @@ def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal']):
             print()
 
             # 1. Create model
-            model = Model(model=model_type, evaluation=evaluation)
+            model = Model(model=model_type, evaluation=evaluation, grid_search=main_grid_search)
             print('(EVALUATOR) Model ' + model_type + ' created')
 
             # 2. Train classifier
@@ -80,5 +80,6 @@ if __name__ == "__main__":
 
     main_hard_evaluation = int(sys.argv[1]) == 1 # 0 no, 1 yes
     main_cross_evaluation = int(sys.argv[2]) # 1 normal, 2 cross
+    main_grid_search = int(sys.argv[3]) == 1 # 0 no, 1 yes
 
-    evaluate(main_hard_evaluation, main_cross_evaluation)
+    evaluate(main_hard_evaluation, main_cross_evaluation, main_grid_search)

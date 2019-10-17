@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import StratifiedKFold, cross_validate
+from sklearn.model_selection import StratifiedKFold, cross_validate, GridSearchCV
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -58,7 +58,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none']):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], grid_search=False):
 
         # Create empty dataset for training
         self.dataset = None
@@ -76,6 +76,7 @@ class Model():
         self.model = model
         self.vectorization = vectorization
         self.evaluation = evaluation
+        self.grid_search = grid_search
         
         # Generate default values
         self.threshold = 0.5
@@ -90,27 +91,90 @@ class Model():
 
     # Create and train classifier depending on chosen model
     def train(self):
-        if self.model == 'svm':
-            self.classifier = SVC(gamma='auto', probability=True)
-        if self.model == 'tree':
-            self.classifier = DecisionTreeClassifier(max_depth=5)
-        if self.model == 'nb':
-            self.classifier = GaussianNB()
-            self.dataset = self.dataset.todense()
-        if self.model == 'knn':
-            self.classifier = KNeighborsClassifier(5)
-        elif self.model == 'mlp_classifier':
-            self.classifier = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=2000, solver='sgd')
+        if self.grid_search:
+            if self.model == 'svm':
+                parameter_space = [
+                    {
+                        'probability': [True],
+                        'kernel': ['rbf'],
+                        'gamma': ['auto', 1e-3, 1e-4],
+                        'C': [1, 10, 100]
+                    },
+                    {
+                        'probability': [True],
+                        'kernel': ['linear'],
+                        'C': [1, 10, 100]
+                    }
+                ]
+                self.classifier = GridSearchCV(SVC(), parameter_space, cv=3, n_jobs=-1)
+            if self.model == 'tree':
+                parameter_space = [
+                    {
+                        'criterion': ['gini', 'entropy'],
+                        'max_depth': np.arange(3, 15)
+                    }
+                ]
+                self.classifier = GridSearchCV(DecisionTreeClassifier(), parameter_space, cv=3, n_jobs=-1)
+            if self.model == 'nb':
+                parameter_space = [
+                    {
+                        'alpha': [2.0, 1.0, 0.5, 0]
+                    }
+                ]
+                self.classifier = GridSearchCV(MultinomialNB(), parameter_space, cv=3, n_jobs=-1)
+                #self.dataset = self.dataset.todense()
+            if self.model == 'knn':
+                parameter_space = [
+                    {
+                        'n_neighbors': [1, 3, 5, 7, 9],
+                        'weights': ['uniform', 'distance'],
+                        'metric': ['euclidean', 'manhattan']
+                    }
+                ]
+                self.classifier = GridSearchCV(KNeighborsClassifier(), parameter_space, cv=3, n_jobs=-1)
+            elif self.model == 'mlp_classifier':
+                parameter_space = [
+                    {
+                        'hidden_layer_sizes': [(50,50,50), (50,100,50), (100,100), (100,)],
+                        'max_iter': [2000],
+                        'activation': ['tanh', 'relu', 'logistic'],
+                        'solver': ['sgd', 'adam'],
+                        'alpha': [0.0001, 0.05],
+                        'learning_rate': ['constant', 'adaptive']
+                    }
+                ]
+                self.classifier = GridSearchCV(MLPClassifier(), parameter_space, cv=3, n_jobs=-1)
+        else:
+            if self.model == 'svm':
+                self.classifier = SVC(gamma='auto', probability=True)
+            if self.model == 'tree':
+                self.classifier = DecisionTreeClassifier(max_depth=5)
+            if self.model == 'nb':
+                self.classifier = MultinomialNB()
+                self.dataset = self.dataset.todense()
+            if self.model == 'knn':
+                self.classifier = KNeighborsClassifier(5)
+            elif self.model == 'mlp_classifier':
+                self.classifier = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=2000, solver='sgd')
 
         # Train using dataset
         self.classifier.fit(self.dataset, self.categories)
+
+        if self.grid_search:
+            print(f'Best hyper parameters for {self.model} are: (Score: {self.classifier.best_score_})')
+            print('')
+            print(self.classifier.best_params_)
+            print('')
+            print(self.classifier.best_estimator_)
+            print('')
+            print('')
 
     # Predict classification for X using classifier
     def predict(self, X):
         # Vectorize text
         examples = self.vectorizer.transform(X)
 
-        if self.model == 'nb' and vectorization == const.VECTORIZERS['features']:
+        if self.model == 'nb' and self.vectorization == const.VECTORIZERS['features']:
             examples = examples.todense()
 
         # Generate classification and probabilities for every class
