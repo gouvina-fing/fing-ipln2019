@@ -18,6 +18,8 @@ def get_dictionary():
 def get_vectors(tweets, dictionary):
 
     res = np.array([np.zeros(300)])
+    tweets['text'] = tweets['text'].apply(convert_tweet_to_embedding, embeddings=dictionary)
+
     '''
     SI USO ESTE METODO EXPLOTA EN EL FIT
 
@@ -29,7 +31,6 @@ def get_vectors(tweets, dictionary):
             import pdb; pdb.set_trace()
             print('errror')
     
-    '''    
     for tweet in tweets:
         e = convert_tweet_to_embedding(tweet, dictionary)
         res = np.concatenate((res,[e]))
@@ -37,6 +38,7 @@ def get_vectors(tweets, dictionary):
     tweets = res
     
     #tweets = np.vectorize(convert_tweet_to_embedding)(tweets,dictionary)
+    '''
     return tweets
 
 # AUXILIAR FUNCTIONS
@@ -69,10 +71,8 @@ def convert_tweet_to_embedding(tweet, embeddings):
 
 def tokenize_text(text):
 
-    # Eliminate symbols --- SE PUEDE USAR UNA ER
     regex = r"¡|!|,|\?|\.|=|\+|-|_|&|\^|%|$|#|@|\(|\)|`|'|<|>|/|:|;|\*|$|¿|\[|\]|\{|\}|~"
     text = re.sub(regex, ' ', text)
-
 
     # Tokenize
     words = [ token.txt for token in tokenize(text) if  token.txt is not None]

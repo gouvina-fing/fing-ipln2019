@@ -55,25 +55,6 @@ def mean_of_tweet_embedding(array_of_words, embeddings):
     for i, elem in enumerate (each_index_array):
         each_index_array[i] = statistics.mean(elem)
     return each_index_array
-    '''
-    try:
-        array_of_arrays = np.vectorize(token_to_embedding)(array_of_words, embeddings)
-    except:
-        import pdb; pdb.set_trace()
-
-    each_index_array = list(zip(*array_of_arrays))
-    return np.vectorize(statistics.mean(each_index_array))
-
-    '''
-    '''
-    result = np.zeros(300)
-    for word in array_of_words:
-        if word in embeddings.keys():
-            result += embeddings.get(word)
-    if len(array_of_words) != 0:
-        result = result / len(array_of_words)
-    return result
-    '''
 
 def token_to_embedding(word, embeddings):
     if word in embeddings.keys():
