@@ -1,6 +1,7 @@
 import os
 import sys
 from model import Model
+import util.features as features
 
 # MAIN FUNCTIONS
 
@@ -9,11 +10,11 @@ def predict(examples):
 
     # 1. Create model
     model = Model()
-    print('(CLASSIFIER) Model created')
+    print('(CLASSIFIER) Creating model...')
 
     # 2. Load classifier
     model.load()
-    print('(CLASSIFIER) Model loaded')
+    print('(CLASSIFIER) Loading model...')
 
     # 3. Make prediction
     prediction = model.predict(examples)

@@ -13,16 +13,19 @@ DATA_VAL_FILE = "/data_val.csv"
 MODEL_FOLDER = MAIN_ROUTE + "/models"
 MODEL_FILE = "/model.sav"
 
-# EVALUATOR
+# TYPES
 # ---------------------------------------------------------------
+
+MODELS = ['svm', 'tree', 'nb', 'knn', 'mlp_classifier']
+
+VECTORIZERS = {
+    'one_hot': 0,
+    'features': 1,
+    'word_embeddings': 2,
+}
 
 EVALUATIONS = {
     'none': 0,
     'normal': 1,
     'cross': 2,
 }
-
-# MODEL
-# ---------------------------------------------------------------
-
-MODELS = ['svm', 'tree', 'nb', 'knn', 'mlp_classifier']

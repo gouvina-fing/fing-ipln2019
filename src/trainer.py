@@ -10,15 +10,15 @@ def train():
 
     # 1. Create model
     model = Model()
-    print('(TRAINER) Model created')
+    print('(TRAINER) Creating model...')
 
     # 2. Train classifier
     model.train()
-    print('(TRAINER) Model trained')
+    print('(TRAINER) Training model...')
 
     # 3. Save classifier
     model.save()
-    print('(TRAINER) Model saved')
+    print('(TRAINER) Saving model...')
 
     return model
 
