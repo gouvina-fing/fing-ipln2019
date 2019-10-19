@@ -18,6 +18,8 @@ def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal']):
             print('(EVALUATOR) Evaluating model ' + model_type)
 
             # 1. Create model
+            import pdb; pdb.set_trace()
+
             model = Model(model=model_type, evaluation=evaluation)
 
             # 2. Train classifier

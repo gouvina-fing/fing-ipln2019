@@ -8,9 +8,12 @@ from model import Model
 # Train a model
 def train():
 
+    tic = time.time()
+
     # 1. Create model
     model = Model()
     print('(TRAINER) Creating model...')
+
 
     # 2. Train classifier
     model.train()
