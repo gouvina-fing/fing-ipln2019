@@ -1,6 +1,5 @@
 import os
 import sys
-import util.const as const
 from model import Model
 
 # MAIN FUNCTIONS

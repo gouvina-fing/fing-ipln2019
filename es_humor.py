@@ -11,24 +11,52 @@
 #    2. generar un archivo de salida test_file1.out … test_fileN.out con las salidas obtenidas a cada archivo de test.
 #       El archivo de salida debe tener las salidas (0 o 1) en orden y separados por un fin de línea. (Ej. 1\n0\n0\n1...\n0)
 
-import src.trainer as trainer
+import sys, os
+sys.path.append(f'{os.getcwd()}/src/')
+
 import pandas as pd
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+import util.const as const
+import trainer as trainer
+from model import Model
+
+best_solution = {
+    'vectorization': const.VECTORIZERS['features'],
+    'model': 'mlp_classifier',
+    'params': {
+        'activation': 'relu',
+        'alpha': 0.0001,
+        'hidden_layer_sizes': (50, 50, 50),
+        'learning_rate': 'constant',
+        'max_iter': 2000,
+        'solver': 'adam'
+    }
+}
 
 def read_input():
     if len(sys.argv) < 2:
         raise Exception('Cantidad insuficiente de parametros')
     data_path = sys.argv[1]
     test_files = []
-    for test_file in sys.argv[:2]:
-        test_files += test_file
+    for test_file in sys.argv[2:]:
+        test_files.append(test_file)
+    return data_path, test_files
 
-def test(test_file):
-    df_test = pd.read_csv(data_path + test_file)
-    prediction = model.predict(df_test['text'].values.astype('U'))
+def run_test(model, path, test_file):
+    ### READ DATA
+    
+    df_test = pd.read_csv(path + test_file)
 
-    accuracy = accuracy_score(df_test['humor'].values, prediction)
-    results = classification_report(df_test['humor'].values, prediction, output_dict=True)
-    matrix = confusion_matrix(df_test['humor'].values, prediction)
+    # TODO: Adaptar esto a lo de Gonza y las embeddings.
+    #       Pasar el dataframe y que sea cada modelo el que lo vectorize y preprocese como quiera.
+    ### PREDICT
+    predictions = model.predict(df_test['text'].values.astype('U'))
+
+    ### PROCESS METRICS
+    accuracy = accuracy_score(df_test['humor'].values, predictions)
+    results = classification_report(df_test['humor'].values, predictions, output_dict=True)
+    matrix = confusion_matrix(df_test['humor'].values, predictions)
 
     report = {
         'f1_score': results['macro avg']['f1-score'],
@@ -45,18 +73,25 @@ def test(test_file):
     print(matrix)
     print()
 
+    print('Test Results:')
+    print(predictions)
+    print()
+
+    ### SAVE RESULTS
     f = open(f"{test_file.replace('.csv', '')}.out", "a")
-        for pred in predictions[:-1]:
-            f.write(f"{pred}\n")
-        f.write(f"{predictions[-1]}")
-        f.close()
+    for pred in predictions[:-1]:
+        f.write(f"{pred}\n")
+    f.write(f"{predictions[-1]}")
+    f.close()
 
 def main():
-    read_input()
+    data_path, test_files = read_input()
 
-    model = trainer.train(data_path=data_path, best_solution=True)
+    model = Model(data_path=data_path, params=best_solution)
+
+    model.train()
 
     for test_file in test_files:
-        test(test_file)
+        run_test(model, data_path, test_file)
   
 main()
