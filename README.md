@@ -71,14 +71,14 @@ Por último a partir del vector de tokens se construye un vector de longitud 300
 Se espera que este word embedding refleje en cierto grado la semántica del tweet y permita que los modelos infieran si el tweet procesado era un chiste o no.
 
 # Experimentación
-Para cada una de las estrategias mencionadas anteriormente, se realizó un grid search a los siguientes modelos de (scikit learn)[https://scikit-learn.org/]:
+Para cada una de las estrategias mencionadas anteriormente, se realizó un grid search a los siguientes modelos de [scikit learn](https://scikit-learn.org/):
 - KNeighborsClassifier
 - Support Vector Classifier
 - DecisionTreeClassifier 
 - MultinomialNB 
 - MLPClassifier
 
-Adicionalmente se entrenó una red de (Keras)[https://keras.io/], haciendo uso de la capa de embeddings proporcionada por keras.
+Adicionalmente se entrenó una red de [Keras](https://keras.io/), haciendo uso de la capa de embeddings proporcionada por keras.
 **TODO: Germán escribir detalles de la red**
 
 # Conclusión
