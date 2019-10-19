@@ -21,7 +21,7 @@ Se proporcionan las siguientes interfaces:
 - `src/trainer.py` - **TODO: Borrar esto?**
 - `src/evaluator.py` - Interfaz que 
   - Invocación: python3 evaluator.py hard_evaluation cross_evaluation grid_search **TODO: Borrar cross eval?**
-  - En donde: hard_evaluator = (0|1), cross_evaluation = (1|2), grid_search = (0|1). Ejemplo: python3 evaluator.py 0 1 0
+  - En donde: hard_evaluator = (0|1), cross_evaluation = (1|2), grid_search = (0|1). Ejemplo: `python3 evaluator.py 0 1 0`
   - Hard evaluator: Si esta flag está en 1 se realiza una `Hard evaluation`, de lo contrario se realiza una `Soft Evaluation`
     - Hard evaluation: Los modelos se entrenan secuencialmente, imprimiendo sus resultados de forma ordenada según cual alcanzó mejor F-measure.
     - Soft evaluation: Los modelos se entrenan secuencialmente, imprimiendo sus resultados conforme sean entrenados.
