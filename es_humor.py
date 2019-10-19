@@ -4,6 +4,9 @@
 #   • intropln2019_embeddings_es_300.txt
 #   y test_file1.csv … test_fileN.csv son un conjunto de archivos de test (pueden tener salida o no).
 
+# EJEMPLO DE INVOCACION:
+# python3 es_humor.py data/ data_test.csv
+
 # El programa debe:
 # 1. Entrenar un clasificador (hiperaparámetros encontrados previamente) utilizando los conjuntos de train y val (debe demorar menos de 10 minutos en una CPU intel i7)
 # 2. Por cada archivo test_file1.csv … test_fileN.csv el programa debe:
