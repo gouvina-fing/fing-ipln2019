@@ -76,10 +76,6 @@ def run_test(model, path, test_file):
     print(matrix)
     print()
 
-    print('Test Results:')
-    print(predictions)
-    print()
-
     ### SAVE RESULTS
     f = open(f"{test_file.replace('.csv', '')}.out", "a")
     for pred in predictions[:-1]:
