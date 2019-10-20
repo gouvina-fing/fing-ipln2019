@@ -22,7 +22,7 @@ class Model():
     def read_dataset(self):
 
         # Read dataset as Pandas DataFrame
-        df = pd.read_csv(const.DATA_FOLDER + const.DATA_TRAIN_FILE)
+        df = pd.read_csv(self.data_path + const.DATA_TRAIN_FILE)
 
         # Shuffle dataset before spliting columns
         df = df.sample(frac=1)
@@ -35,7 +35,7 @@ class Model():
         if self.evaluation != const.EVALUATIONS['none']:
             
             # Read dataset as Pandas DataFrame
-            df_test = pd.read_csv(const.DATA_FOLDER + const.DATA_TEST_FILE)
+            df_test = pd.read_csv(self.data_path + const.DATA_TEST_FILE)
 
             # Shuffle dataset before spliting columns
             df_test = df_test.sample(frac=1)
@@ -58,7 +58,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], grid_search=False):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
 
         # Create empty dataset for training
         self.dataset = None
@@ -73,10 +73,11 @@ class Model():
         self.vectorizer = None
 
         # Create other configuration values
-        self.model = model
-        self.vectorization = vectorization
+        self.model = params['model'] if params['model'] else model
+        self.vectorization = params['vectorization'] if params['vectorization'] else model
         self.evaluation = evaluation
-        self.grid_search = grid_search
+        self.params = params['params']
+        self.data_path = data_path
         
         # Generate default values
         self.threshold = 0.5
@@ -90,69 +91,40 @@ class Model():
         self.vectorize_dataset()
 
     # Create and train classifier depending on chosen model
-    def train(self):
-        if self.grid_search:
+    def train(self, grid_search=False):
+        if grid_search:
+            parameter_space = grid_search_params()
             if self.model == 'svm':
-                parameter_space = [
-                    {
-                        'probability': [True],
-                        'kernel': ['rbf'],
-                        'gamma': ['auto', 1e-3, 1e-4],
-                        'C': [1, 10, 100]
-                    },
-                    {
-                        'probability': [True],
-                        'kernel': ['linear'],
-                        'C': [1, 10, 100]
-                    }
-                ]
                 self.classifier = GridSearchCV(SVC(), parameter_space, cv=3, n_jobs=-1)
-            if self.model == 'tree':
-                parameter_space = [
-                    {
-                        'criterion': ['gini', 'entropy'],
-                        'max_depth': np.arange(3, 15)
-                    }
-                ]
+            elif self.model == 'tree':
                 self.classifier = GridSearchCV(DecisionTreeClassifier(), parameter_space, cv=3, n_jobs=-1)
-            if self.model == 'nb':
-                parameter_space = [
-                    {
-                        'alpha': [2.0, 1.0, 0.5, 0]
-                    }
-                ]
+            elif self.model == 'nb':
                 self.classifier = GridSearchCV(MultinomialNB(), parameter_space, cv=3, n_jobs=-1)
-                #self.dataset = self.dataset.todense()
-            if self.model == 'knn':
-                parameter_space = [
-                    {
-                        'n_neighbors': [1, 3, 5, 7, 9],
-                        'weights': ['uniform', 'distance'],
-                        'metric': ['euclidean', 'manhattan']
-                    }
-                ]
+            elif self.model == 'knn':
                 self.classifier = GridSearchCV(KNeighborsClassifier(), parameter_space, cv=3, n_jobs=-1)
             elif self.model == 'mlp_classifier':
-                parameter_space = [
-                    {
-                        'hidden_layer_sizes': [(50,50,50), (50,100,50), (100,100), (100,)],
-                        'max_iter': [2000],
-                        'activation': ['tanh', 'relu', 'logistic'],
-                        'solver': ['sgd', 'adam'],
-                        'alpha': [0.0001, 0.05],
-                        'learning_rate': ['constant', 'adaptive']
-                    }
-                ]
                 self.classifier = GridSearchCV(MLPClassifier(), parameter_space, cv=3, n_jobs=-1)
+        elif self.params is not None:
+            if self.model == 'svm':
+                self.classifier = SVC(**self.params)
+            elif self.model == 'tree':
+                self.classifier = DecisionTreeClassifier(**self.params)
+            elif self.model == 'nb':
+                self.classifier = MultinomialNB(**self.params)
+                self.dataset = self.dataset.todense()
+            elif self.model == 'knn':
+                self.classifier = KNeighborsClassifier(**self.params)
+            elif self.model == 'mlp_classifier':
+                self.classifier = MLPClassifier(**self.params)
         else:
             if self.model == 'svm':
                 self.classifier = SVC(gamma='auto', probability=True)
-            if self.model == 'tree':
+            elif self.model == 'tree':
                 self.classifier = DecisionTreeClassifier(max_depth=5)
-            if self.model == 'nb':
+            elif self.model == 'nb':
                 self.classifier = MultinomialNB()
                 self.dataset = self.dataset.todense()
-            if self.model == 'knn':
+            elif self.model == 'knn':
                 self.classifier = KNeighborsClassifier(5)
             elif self.model == 'mlp_classifier':
                 self.classifier = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=2000, solver='sgd')
@@ -160,7 +132,7 @@ class Model():
         # Train using dataset
         self.classifier.fit(self.dataset, self.categories)
 
-        if self.grid_search:
+        if grid_search:
             print(f'Best hyper parameters for {self.model} are: (Score: {self.classifier.best_score_})')
             print('')
             print(self.classifier.best_params_)
@@ -233,3 +205,53 @@ class Model():
         accuracy = sum(accuracy_list) / len(accuracy_list)
 
         return accuracy, report, None, None
+
+    def grid_search_params():
+        parameter_space = {}
+        if self.model == 'svm':
+            parameter_space = [
+                {
+                    'probability': [True],
+                    'kernel': ['rbf'],
+                    'gamma': ['auto', 1e-3, 1e-4],
+                    'C': [1, 10, 100]
+                },
+                {
+                    'probability': [True],
+                    'kernel': ['linear'],
+                    'C': [1, 10, 100]
+                }
+            ]
+        if self.model == 'tree':
+            parameter_space = [
+                {
+                    'criterion': ['gini', 'entropy'],
+                    'max_depth': np.arange(3, 15)
+                }
+            ]
+        if self.model == 'nb':
+            parameter_space = [
+                {
+                    'alpha': [2.0, 1.0, 0.5, 0]
+                }
+            ]
+        if self.model == 'knn':
+            parameter_space = [
+                {
+                    'n_neighbors': [1, 3, 5, 7, 9],
+                    'weights': ['uniform', 'distance'],
+                    'metric': ['euclidean', 'manhattan']
+                }
+            ]
+        elif self.model == 'mlp_classifier':
+            parameter_space = [
+                {
+                    'hidden_layer_sizes': [(50,50,50), (50,100,50), (100,100), (100,)],
+                    'max_iter': [2000],
+                    'activation': ['tanh', 'relu', 'logistic'],
+                    'solver': ['sgd', 'adam'],
+                    'alpha': [0.0001, 0.05],
+                    'learning_rate': ['constant', 'adaptive']
+                }
+            ]
+        return parameter_space
