@@ -18,10 +18,10 @@ def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal'], main
             print('(EVALUATOR) Evaluating model ' + model_type)
 
             # 1. Create model
-            model = Model(model=model_type, evaluation=evaluation, grid_search=main_grid_search)
+            model = Model(model=model_type, evaluation=evaluation)
 
             # 2. Train classifier
-            model.train()
+            model.train(grid_search=main_grid_search)
 
             # 3. Evaluate classifier
             accuracy, results, _, _ = model.evaluate()
@@ -57,11 +57,11 @@ def evaluate(hard_evaluation=False, evaluation=const.EVALUATIONS['normal'], main
             print()
 
             # 1. Create model
-            model = Model(model=model_type, evaluation=evaluation, grid_search=main_grid_search)
+            model = Model(model=model_type, evaluation=evaluation)
             print('(EVALUATOR) Model ' + model_type + ' created')
 
             # 2. Train classifier
-            model.train()
+            model.train(grid_search=main_grid_search)
             print('(EVALUATOR) Model ' + model_type + ' trained')
 
             # 3. Evaluate classifier
