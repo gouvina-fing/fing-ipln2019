@@ -47,8 +47,8 @@ def get_features(tweets):
 # AUXILIARY FUNCTIONS
 
 def extract_features(tweet):
-    # Eliminate leading whitespaces and convert every other whitespace other to " "
-    tweet = re.sub('[\t\n\r\f\v]+', ' ', tweet).strip()
+    # Convert every whitespace character to ' ' and collapse multiple whitespaces to one.
+    tweet = re.sub('\s+', ' ', tweet).strip()
 
     downcased_tweet = tweet.lower()
 
@@ -61,9 +61,9 @@ def extract_features(tweet):
     features['number_of_hashtags'] = number_of_regex_occurrences(hasthag_regex, tweet)
     features['number_of_question_answers'] = number_of_regex_occurrences(question_answer_regex, tweet)
 
-    features['number_of_keywords'] = ratio_of_word_ocurrences(keywords, tweet)
-    features['number_of_animals'] = ratio_of_word_ocurrences(animals, tweet)
-    features['number_of_sexual_words'] = ratio_of_word_ocurrences(sexual_words, tweet)
+    features['ratio_of_keywords'] = ratio_of_word_ocurrences(keywords, tweet)
+    features['ratio_of_animals'] = ratio_of_word_ocurrences(animals, tweet)
+    features['ratio_of_sexual_words'] = ratio_of_word_ocurrences(sexual_words, tweet)
 
     features['capslock_ratio'] = capslock_ratio(tweet)
     

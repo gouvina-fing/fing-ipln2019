@@ -61,23 +61,12 @@ def tokenize_text(text):
 
 
 def mean_of_tweet_embedding(array_of_words, embeddings):
-    '''
-    for i, elem in enumerate(array_of_words):
-        a[i] = token_to_embedding(elem, embeddings)
-
-    each_index_array = list(zip(*a))
-
-    for i, elem in enumerate (each_index_array):
-        each_index_array[i] = statistics.mean(elem)
-    '''
-    
     data = pd.Series(array_of_words)
     data = data.apply(token_to_embedding,embeddings=embeddings)
     each_index_array = list(zip(*data))
     each_index_array = list(map(statistics.mean,each_index_array))
     each_index_array = np.array(each_index_array)
 
-    
     return each_index_array
   
 def token_to_embedding(word, embeddings):

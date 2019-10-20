@@ -1,15 +1,11 @@
 import os
 import sys
-import util.const as const
 from model import Model
 
 # MAIN FUNCTIONS
 
 # Train a model
 def train():
-
-    tic = time.time()
-
     # 1. Create model
     model = Model()
     print('(TRAINER) Creating model...')
