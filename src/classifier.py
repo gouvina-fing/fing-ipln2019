@@ -1,7 +1,7 @@
 import os
 import sys
 from model import Model
-import util.features as features
+#import util.features as features
 
 # MAIN FUNCTIONS
 
