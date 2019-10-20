@@ -63,6 +63,6 @@ class Vectorizer():
 
         # If vectorization is by word embeddings, uses word embeddings dictionary and mean        
         if self.type == const.VECTORIZERS['word_embeddings']:
-            vectorized = embeddings_vectorizer.get_vectors(X)
+            vectorized = embeddings_vectorizer.get_vectors(X, self.dictionary)
 
         return vectorized

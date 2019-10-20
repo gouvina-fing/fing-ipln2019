@@ -27,6 +27,7 @@ class Model():
         # Shuffle dataset before spliting columns
         df = df.sample(frac=1)
 
+        self.dataframe = df
         # Get train dataset and train categories
         self.dataset = df['text'].values.astype('U')
         self.categories = df['humor'].values
@@ -39,6 +40,8 @@ class Model():
 
             # Shuffle dataset before spliting columns
             df_test = df_test.sample(frac=1)
+    
+            self.test_dataframe = df_test
 
             # Get train dataset and train categories
             self.test_dataset = df_test['text'].values.astype('U')
@@ -47,7 +50,11 @@ class Model():
     # Vectorize texts for input to model
     def vectorize_dataset(self):
         self.vectorizer = Vectorizer(self.vectorization)
-        self.dataset = self.vectorizer.fit(self.dataset)
+        if self.vectorization == const.VECTORIZERS['word_embeddings']:
+            self.dataframe = self.vectorizer.fit(self.dataframe)
+            self.dataset = list(np.array(self.dataframe['text'], dtype=object))
+        else:
+            self.dataset = self.vectorizer.fit(self.dataset)
 
     # Aux function - For saving classifier
     def save(self):
@@ -58,9 +65,11 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
+    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
 
         # Create empty dataset for training
+        self.dataframe = None
+
         self.dataset = None
         self.categories = None
 
@@ -73,10 +82,10 @@ class Model():
         self.vectorizer = None
 
         # Create other configuration values
-        self.model = params['model'] if params['model'] else model
-        self.vectorization = params['vectorization'] if params['vectorization'] else model
+        self.model = params['model'] if 'model' in params else model
+        self.vectorization = params['vectorization'] if 'vectorization' in params else vectorization
         self.evaluation = evaluation
-        self.params = params['params']
+        self.params = params['params'] if 'params' in params else None
         self.data_path = data_path
         
         # Generate default values
@@ -145,9 +154,12 @@ class Model():
     def predict(self, X):
         # Vectorize text
         examples = self.vectorizer.transform(X)
+        if self.vectorization == const.VECTORIZERS['word_embeddings']:
+            examples = np.array(examples['text'], dtype=object)
+            examples = list(map(lambda a: np.zeros(300) if len(a) != 300 else a,examples))
 
-        if self.model == 'nb' and self.vectorization == const.VECTORIZERS['features']:
-            examples = examples.todense()
+        #if self.model == 'nb' and vectorization == const.VECTORIZERS['features']:
+            #examples = examples.todense()
 
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)
@@ -170,7 +182,10 @@ class Model():
     # Generate normal evaluation
     def normal_evaluate(self):
 
-        prediction = self.predict(self.test_dataset)
+        if self.vectorization == const.VECTORIZERS['word_embeddings']:
+            prediction = self.predict(self.test_dataframe)
+        else:
+            prediction = self.predict(self.test_dataset)
 
         accuracy = accuracy_score(self.test_categories, prediction)
         results = classification_report(self.test_categories, prediction, output_dict=True)

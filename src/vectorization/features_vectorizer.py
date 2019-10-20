@@ -27,13 +27,13 @@ question_answer_regex = re.compile(
 word_or_number_regex = re.compile(r'\b\w+\b')
 capslock_word_regex = re.compile(r'\b[A-Z_]+\b')
 
-keywords = read_dictionary('src/vectorization/dictionaries/keywords.dic')
+keywords = read_dictionary('vectorization/dictionaries/keywords.dic')
 keywords = [x.lower() for x in keywords]
 
-sexual_words = read_dictionary('src/vectorization/dictionaries/sexual.dic')
+sexual_words = read_dictionary('vectorization/dictionaries/sexual.dic')
 sexual_words = [x.lower() for x in sexual_words]
 
-animals = read_dictionary('src/vectorization/dictionaries/animales.dic')
+animals = read_dictionary('vectorization/dictionaries/animales.dic')
 animals = [x.lower() for x in animals]
 
 hasthag_regex = re.compile(r'(\B#\w+)')
