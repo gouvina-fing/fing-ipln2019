@@ -73,7 +73,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='svm', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
 
         # Create empty dataset for training
         self.dataset = None
@@ -110,7 +110,7 @@ class Model():
 
         # If grid search is setted, train testing each param depending on the chosen model
         if grid_search:
-            parameter_space = grid_search_params()
+            parameter_space = self.grid_search_evaluate()
             if self.model == 'svm':
                 self.classifier = GridSearchCV(SVC(), parameter_space, cv=3, n_jobs=-1)
             elif self.model == 'tree':
@@ -152,21 +152,23 @@ class Model():
 
         # Train using dataset
         tic = time.time()
-        print(self.dataset)
-        print(np.where(np.isnan(self.dataset)))
         self.classifier.fit(self.dataset, self.categories)
         toc = time.time()
         print('(MODEL) Model trained in ' + '{0:.2f}'.format(toc - tic) + ' seconds')
 
         # Show best hyper parameters for the model
         if grid_search:
-            print(f'(MODEL) Best hyper parameters for {self.model} are: (Score: {self.classifier.best_score_})')
+            print(f'(MODEL) Best estimator for {self.model}:')
+            print(self.classifier.best_estimator_)            
             print('')
+
+            print(f'(MODEL) Best hyper parameters for {self.model}:')
             print(self.classifier.best_params_)
             print('')
-            print(self.classifier.best_estimator_)
+
+            print(f'(MODEL) Best score for {self.model}: (Score: {self.classifier.best_score_})')
             print('')
-            print('')
+
 
     # Predict classification for X using classifier
     def predict(self, X):
