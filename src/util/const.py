@@ -20,7 +20,6 @@ MODEL_FILE = "/model.sav"
 MODELS = ['svm', 'tree', 'nb', 'knn', 'mlp_classifier']
 
 VECTORIZERS = {
-    'one_hot': 0,
     'features': 1,
     'word_embeddings': 2,
 }

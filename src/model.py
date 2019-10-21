@@ -1,3 +1,5 @@
+# DEPENDENCIES
+import time
 import pickle
 import pandas as pd
 import numpy as np
@@ -13,6 +15,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 from vectorization.vectorizer import Vectorizer
 import util.const as const
 
+# MAIN CLASS
 class Model():
     '''
     Model representation
@@ -27,8 +30,8 @@ class Model():
         # Shuffle dataset before spliting columns
         df = df.sample(frac=1)
 
-        self.dataframe = df
-        # Get train dataset and train categories
+        # Save dataframe, get train dataset and train categories
+        self.dataframe = df        
         self.dataset = df['text'].values.astype('U')
         self.categories = df['humor'].values
 
@@ -40,19 +43,24 @@ class Model():
 
             # Shuffle dataset before spliting columns
             df_test = df_test.sample(frac=1)
-    
-            self.test_dataframe = df_test
 
-            # Get train dataset and train categories
+            # Save dataframe, get train dataset and train categories
+            self.test_dataframe = df_test            
             self.test_dataset = df_test['text'].values.astype('U')
             self.test_categories = df_test['humor'].values
 
     # Vectorize texts for input to model
     def vectorize_dataset(self):
+        
+        # Create vectorizer interface
         self.vectorizer = Vectorizer(self.vectorization)
+        
+        # If vectorization type is embeddings, vectorize using dataframe and then extract
         if self.vectorization == const.VECTORIZERS['word_embeddings']:
             self.dataframe = self.vectorizer.fit(self.dataframe)
             self.dataset = list(np.array(self.dataframe['text'], dtype=object))
+        
+        # If not, vectorize numpy array
         else:
             self.dataset = self.vectorizer.fit(self.dataset)
 
@@ -65,11 +73,9 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
+    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='svm', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
 
         # Create empty dataset for training
-        self.dataframe = None
-
         self.dataset = None
         self.categories = None
 
@@ -78,6 +84,7 @@ class Model():
         self.test_categories = None
 
         # Create other empty objects
+        self.dataframe = None        
         self.classifier = None
         self.vectorizer = None
 
@@ -89,7 +96,6 @@ class Model():
         self.data_path = data_path
         
         # Generate default values
-        self.threshold = 0.5
         self.evaluation_normal_size = 0.2
         self.evaluation_cross_k = StratifiedKFold(10, True)
 
@@ -101,6 +107,8 @@ class Model():
 
     # Create and train classifier depending on chosen model
     def train(self, grid_search=False):
+
+        # If grid search is setted, train testing each param depending on the chosen model
         if grid_search:
             parameter_space = grid_search_params()
             if self.model == 'svm':
@@ -113,6 +121,8 @@ class Model():
                 self.classifier = GridSearchCV(KNeighborsClassifier(), parameter_space, cv=3, n_jobs=-1)
             elif self.model == 'mlp_classifier':
                 self.classifier = GridSearchCV(MLPClassifier(), parameter_space, cv=3, n_jobs=-1)
+
+        # If params are passed when creating model, train using them
         elif self.params is not None:
             if self.model == 'svm':
                 self.classifier = SVC(**self.params)
@@ -125,9 +135,11 @@ class Model():
                 self.classifier = KNeighborsClassifier(**self.params)
             elif self.model == 'mlp_classifier':
                 self.classifier = MLPClassifier(**self.params)
+
+        # If there are no params and is not a grid search, train using default params
         else:
             if self.model == 'svm':
-                self.classifier = SVC(gamma='auto', probability=True)
+                self.classifier = SVC(gamma='auto')
             elif self.model == 'tree':
                 self.classifier = DecisionTreeClassifier(max_depth=5)
             elif self.model == 'nb':
@@ -139,10 +151,16 @@ class Model():
                 self.classifier = MLPClassifier(hidden_layer_sizes=(100, 100), max_iter=2000, solver='sgd')
 
         # Train using dataset
+        tic = time.time()
+        print(self.dataset)
+        print(np.where(np.isnan(self.dataset)))
         self.classifier.fit(self.dataset, self.categories)
+        toc = time.time()
+        print('(MODEL) Model trained in ' + '{0:.2f}'.format(toc - tic) + ' seconds')
 
+        # Show best hyper parameters for the model
         if grid_search:
-            print(f'Best hyper parameters for {self.model} are: (Score: {self.classifier.best_score_})')
+            print(f'(MODEL) Best hyper parameters for {self.model} are: (Score: {self.classifier.best_score_})')
             print('')
             print(self.classifier.best_params_)
             print('')
@@ -152,8 +170,10 @@ class Model():
 
     # Predict classification for X using classifier
     def predict(self, X):
+        
         # Vectorize text
         examples = self.vectorizer.transform(X)
+
         if self.vectorization == const.VECTORIZERS['word_embeddings']:
             examples = np.array(examples['text'], dtype=object)
             examples = list(map(lambda a: np.zeros(300) if len(a) != 300 else a,examples))
@@ -221,18 +241,17 @@ class Model():
 
         return accuracy, report, None, None
 
-    def grid_search_params():
+    # Generate parameter space for model
+    def grid_search_evaluate(self):
         parameter_space = {}
         if self.model == 'svm':
             parameter_space = [
                 {
-                    'probability': [True],
                     'kernel': ['rbf'],
                     'gamma': ['auto', 1e-3, 1e-4],
                     'C': [1, 10, 100]
                 },
                 {
-                    'probability': [True],
                     'kernel': ['linear'],
                     'C': [1, 10, 100]
                 }
