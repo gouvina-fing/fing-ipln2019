@@ -7,11 +7,10 @@ Laboratorios del curso de Introducción al Procesamiento de Lenguaje Natural 201
 Para la ejecución de este laboratorio se empleó:
 - Python v3.7.4
 - sckit-learn v0.21.3
-- keras v2.3.1
 - pandas v0.25.2
 - numpy v1.8.2
 - pickle v4.0
-- NLTK v3.4.5
+- tokenizer v1.4.0
 
 # Interfaces
 Se proporcionan las siguientes interfaces:
@@ -20,7 +19,7 @@ Se proporcionan las siguientes interfaces:
 - `src/classifier.py` - Interfaz que carga el último modelo entrenado y clasifica un tweet ingresado mediante input.
 - `src/trainer.py` - Interfaz que entrena un MLP con hiperparámetros por defecto y lo guarda en un pickle (fue usada más que nada para pruebas del código durante su desarrollo) 
 - `src/evaluator.py` - Interfaz que evalua el rendimiento de distintos modelos y se pueden modificar los hiperparametros
-  - Invocación: python3 evaluator.py hard_evaluation grid_search
+  - Invocación: `python3 evaluator.py hard_evaluation grid_search`
   - En donde: hard_evaluator = (0|1), grid_search = (0|1). Ejemplo: `python3 evaluator.py 0 0`
   - Hard evaluator: Si esta flag está en 1 se realiza una `Hard evaluation`, de lo contrario se realiza una `Soft Evaluation`
     - Hard evaluation: Los modelos se entrenan secuencialmente, imprimiendo sus resultados de forma ordenada según cual alcanzó mejor F-measure.
@@ -36,7 +35,7 @@ Para el procesamiento de los datos se implementaron las siguientes herramientas:
 - `src/vectorization/vectorizer` - Interfaz que abstrae el uso que el modelo hace del vectorizer.
 
 # Metodología
-Para el procesamiento de los tweets se proporcionan dos estratégias, las cuales consisten en:
+Para el procesamiento de los tweets se proporcionan dos estrategias, las cuales consisten en:
 
 ## Features
 Basadas en el proyecto de grado [Detección de humor en textos en español](https://www.fing.edu.uy/inco/grupos/pln/prygrado/Informepghumor.pdf) [GitHub](https://github.com/pln-fing-udelar/pghumor), desarrollado por Santiago Castro y Matías Cubero.
