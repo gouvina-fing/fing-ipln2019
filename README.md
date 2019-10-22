@@ -16,12 +16,12 @@ Para la ejecución de este laboratorio se empleó:
 # Interfaces
 Se proporcionan las siguientes interfaces:
 - `es_humor.py` - Intefaz requerida por el laboratorio.
-  - Ejemplo de invocación: `python3 es_humor.py data/ data_test.csv`
+  - Ejemplo de invocación: `python3 es_humor.py data/ data_test.csv data_val.csv`
 - `src/classifier.py` - Interfaz que carga el último modelo entrenado y clasifica un tweet ingresado mediante input.
 - `src/trainer.py` - Interfaz que entrena un MLP con hiperparámetros por defecto y lo guarda en un pickle (fue usada más que nada para pruebas del código durante su desarrollo) 
 - `src/evaluator.py` - Interfaz que 
-  - Invocación: python3 evaluator.py hard_evaluation cross_evaluation grid_search **TODO: Borrar cross eval?**
-  - En donde: hard_evaluator = (0|1), grid_search = (0|1). Ejemplo: `python3 evaluator.py 0 1 0`
+  - Invocación: python3 evaluator.py hard_evaluation grid_search
+  - En donde: hard_evaluator = (0|1), grid_search = (0|1). Ejemplo: `python3 evaluator.py 0 0`
   - Hard evaluator: Si esta flag está en 1 se realiza una `Hard evaluation`, de lo contrario se realiza una `Soft Evaluation`
     - Hard evaluation: Los modelos se entrenan secuencialmente, imprimiendo sus resultados de forma ordenada según cual alcanzó mejor F-measure.
     - Soft evaluation: Los modelos se entrenan secuencialmente, imprimiendo sus resultados conforme sean entrenados.
@@ -31,7 +31,6 @@ Se proporcionan las siguientes interfaces:
 
 # Herramientas
 Para el procesamiento de los datos se implementaron las siguientes herramientas:
-- `src/util/corrector.py` - **TODO: qué mierda hacemos con esto?**
 - `src/vectorization/embeddings_vectorizer` - Vectoriza un tweet a una lista de floats (procedimiento que será detallado a continuación).
 - `src/vectorization/features_vectorizer` - Vectoriza un tweet a una lista de features (las cuales serán detalladas a continuación).
 - `src/vectorization/vectorizer` - Interfaz que abstrae el uso que el modelo hace del vectorizer.
@@ -75,8 +74,12 @@ Para cada una de las estrategias mencionadas anteriormente, se realizó un grid 
 - KNeighborsClassifier
 - Support Vector Classifier
 - DecisionTreeClassifier 
-- MultinomialNB 
+- MultinomialNB
 - MLPClassifier
+
+Para la estrategia `Features` el mejor resultado alcanzado obtuvo una F-Measure de 
+
+Si bien para la estrategia `Word Embeddings` se logró obtener un mejor resultado (F-Measure )
 
 Adicionalmente se entrenó una red de [Keras](https://keras.io/), haciendo uso de la capa de embeddings proporcionada por keras.
 **TODO: Germán escribir detalles de la red**
