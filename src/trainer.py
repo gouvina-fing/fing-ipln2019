@@ -1,3 +1,4 @@
+# DEPENDENCIES
 import os
 import sys
 from model import Model
@@ -7,17 +8,16 @@ from model import Model
 # Train a model
 def train():
     # 1. Create model
+    print('(TRAINER) Creating model...')    
     model = Model()
-    print('(TRAINER) Creating model...')
-
 
     # 2. Train classifier
-    model.train()
     print('(TRAINER) Training model...')
+    model.train()
 
     # 3. Save classifier
-    model.save()
     print('(TRAINER) Saving model...')
+    model.save()
 
     return model
 

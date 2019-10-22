@@ -30,8 +30,8 @@ best_solution = {
     'params': {
         'activation': 'relu',
         'alpha': 0.0001,
-        'hidden_layer_sizes': (50, 50, 50),
-        'learning_rate': 'constant',
+        'hidden_layer_sizes': (50, 100, 50),
+        'learning_rate': 'adaptive',
         'max_iter': 2000,
         'solver': 'adam'
     }
@@ -48,11 +48,8 @@ def read_input():
 
 def run_test(model, path, test_file):
     ### READ DATA
-    
     df_test = pd.read_csv(path + test_file)
-
-    # TODO: Adaptar esto a lo de Gonza y las embeddings.
-    #       Pasar el dataframe y que sea cada modelo el que lo vectorize y preprocese como quiera.
+    
     ### PREDICT
     predictions = model.predict(df_test['text'].values.astype('U'))
 
@@ -66,13 +63,13 @@ def run_test(model, path, test_file):
         'precision': results['macro avg']['precision'],
         'recall': results['macro avg']['recall'],
     }
-    print('Results:')
     print()
-    print('Accuracy: ' + str(accuracy))
-    print('Classification Report: ')
-    print(report)
-    print()
-    print('Confusion Matrix: ')
+    print('(EVALUATION) Accuracy: ' + str(accuracy))
+    print('(EVALUATION) Classification Report: ')
+    print('--> Precision (avg): ' + "{0:.2f}".format(report['f1_score']))
+    print('--> Recall (avg): ' + "{0:.2f}".format(report['recall']))
+    print('--> F1 Score (avg): ' + "{0:.2f}".format(report['precision']))
+    print('(EVALUATION) Confusion Matrix: ')
     print(matrix)
     print()
 

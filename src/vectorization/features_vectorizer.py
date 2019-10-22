@@ -1,15 +1,17 @@
+# DEPENDENCIES
 import re
 import math
 import numpy as np
 
+# AUX FUNCTIONS
+
+# Read file as a dict
 def read_dictionary(filename):
     with open(filename) as dictionary:
         return {word.rstrip('\n') for word in dictionary if word.rstrip('\n')}
 
 # CONSTANTS
 
-# Lista de símbolos de diálogo posibles. Parecen todos iguales, pero son distintos
-# (algunos son hyphen, otros dashes, otros minus sign, viñetas, etc.)
 dialogue_punctuation = ['-', '—', '–', '―', '‒', '‐', '−', '­', '‑', '⁃', '֊', '˗', '⁻', '⏤', '─', '➖']
 
 url_regex = re.compile(
@@ -27,13 +29,13 @@ question_answer_regex = re.compile(
 word_or_number_regex = re.compile(r'\b\w+\b')
 capslock_word_regex = re.compile(r'\b[A-Z_]+\b')
 
-keywords = read_dictionary('vectorization/dictionaries/keywords.dic')
+keywords = read_dictionary('src/vectorization/dictionaries/keywords.dic')
 keywords = [x.lower() for x in keywords]
 
-sexual_words = read_dictionary('vectorization/dictionaries/sexual.dic')
+sexual_words = read_dictionary('src/vectorization/dictionaries/sexual.dic')
 sexual_words = [x.lower() for x in sexual_words]
 
-animals = read_dictionary('vectorization/dictionaries/animales.dic')
+animals = read_dictionary('src/vectorization/dictionaries/animales.dic')
 animals = [x.lower() for x in animals]
 
 hasthag_regex = re.compile(r'(\B#\w+)')
@@ -41,11 +43,12 @@ hasthag_regex = re.compile(r'(\B#\w+)')
 exclamation_regex = re.compile(r'(\b¡\w*!\b|!\b)')
 
 # MAIN FUNCTIONS
+
+# Given a list of tweets, return a list of dicts with each tweet's features
 def get_features(tweets):
     return np.vectorize(extract_features)(tweets)
 
-# AUXILIARY FUNCTIONS
-
+# Given a tweet, return a dict with its features
 def extract_features(tweet):
     # Convert every whitespace character to ' ' and collapse multiple whitespaces to one.
     tweet = re.sub('\s+', ' ', tweet).strip()
@@ -69,7 +72,7 @@ def extract_features(tweet):
     
     return features
 
-############################
+# AUX FUNCTIONS
 
 # Determines if tweet starts with any dialogue symbol
 def starts_with_dialogue(tweet):

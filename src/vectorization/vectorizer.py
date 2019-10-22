@@ -1,16 +1,18 @@
+# DEPENDENCIES
+from sklearn.decomposition import PCA
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction.text import CountVectorizer
 import vectorization.features_vectorizer as features_vectorizer
 import vectorization.embeddings_vectorizer  as embeddings_vectorizer
 import util.const as const
 
+# MAIN CLASS
 class Vectorizer():
     '''
     Vectorizer interface
     '''
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['one_hot']):
+    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings']):
 
         # Type of vectorizer
         self.type = vectorization
@@ -20,8 +22,6 @@ class Vectorizer():
         self.dictionary = None
 
         # Depending on vectorization type, initializes different objects
-        if self.type == const.VECTORIZERS['one_hot']:
-            self.vectorizer = CountVectorizer()
         if self.type == const.VECTORIZERS['features']:
             self.vectorizer = DictVectorizer()
         if self.type == const.VECTORIZERS['word_embeddings']:
@@ -31,10 +31,6 @@ class Vectorizer():
     def fit(self, X):
 
         vectorized = []
-
-        # If vectorization is one hot encoding, uses CountVectorizer
-        if self.type == const.VECTORIZERS['one_hot']:
-            vectorized = self.vectorizer.fit_transform(X).toarray()
 
         # If vectorization is by features, uses feature extraction and DictVectorizer
         if self.type == const.VECTORIZERS['features']:
@@ -50,11 +46,7 @@ class Vectorizer():
     # Given a set X, vectorizes it using last vectorizer
     def transform(self, X):
         
-        vectorized = []
-
-        # If vectorization is one hot encoding, uses CountVectorizer        
-        if self.type == const.VECTORIZERS['one_hot']:
-            vectorized = self.vectorizer.transform(X).toarray()
+        vectorized = []      
 
         # If vectorization is by features, uses feature extraction and DictVectorizer        
         if self.type == const.VECTORIZERS['features']:
