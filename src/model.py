@@ -73,7 +73,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
+    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='nb', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
 
         # Create empty dataset for training
         self.dataset = None
@@ -168,7 +168,6 @@ class Model():
 
             print(f'(MODEL) Best score for {self.model}: (Score: {self.classifier.best_score_})')
             print('')
-
 
     # Predict classification for X using classifier
     def predict(self, X):
