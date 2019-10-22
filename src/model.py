@@ -171,9 +171,6 @@ class Model():
             examples = np.array(examples['text'], dtype=object)
             examples = list(map(lambda a: np.zeros(300) if len(a) != 300 else a,examples))
 
-        #if self.model == 'nb' and vectorization == const.VECTORIZERS['features']:
-            #examples = examples.todense()
-
         # Generate classification and probabilities for every class
         prediction = self.classifier.predict(examples)
 
