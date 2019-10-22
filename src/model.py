@@ -8,7 +8,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import StratifiedKFold, cross_validate, GridSearchCV
+from sklearn.model_selection import GridSearchCV
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -35,19 +35,16 @@ class Model():
         self.dataset = df['text'].values.astype('U')
         self.categories = df['humor'].values
 
-        # If there is evaluation, get train dataset too
-        if self.evaluation != const.EVALUATIONS['none']:
-            
-            # Read dataset as Pandas DataFrame
-            df_test = pd.read_csv(self.data_path + const.DATA_TEST_FILE)
+        # Read dataset as Pandas DataFrame
+        df_test = pd.read_csv(self.data_path + const.DATA_TEST_FILE)
 
-            # Shuffle dataset before spliting columns
-            df_test = df_test.sample(frac=1)
+        # Shuffle dataset before spliting columns
+        df_test = df_test.sample(frac=1)
 
-            # Save dataframe, get train dataset and train categories
-            self.test_dataframe = df_test            
-            self.test_dataset = df_test['text'].values.astype('U')
-            self.test_categories = df_test['humor'].values
+        # Save dataframe, get train dataset and train categories
+        self.test_dataframe = df_test            
+        self.test_dataset = df_test['text'].values.astype('U')
+        self.test_categories = df_test['humor'].values
 
     # Vectorize texts for input to model
     def vectorize_dataset(self):
@@ -73,7 +70,7 @@ class Model():
         self.classifier = pickle.load(open(const.MODEL_FOLDER + const.MODEL_FILE, 'rb'))
 
     # Constructor
-    def __init__(self, vectorization=const.VECTORIZERS['word_embeddings'], model='mlp_classifier', evaluation=const.EVALUATIONS['none'], data_path=const.DATA_FOLDER, params={}):
+    def __init__(self, vectorization=const.VECTORIZERS['features'], model='mlp_classifier', data_path=const.DATA_FOLDER, params={}):
 
         # Create empty dataset for training
         self.dataset = None
@@ -91,14 +88,9 @@ class Model():
         # Create other configuration values
         self.model = params['model'] if 'model' in params else model
         self.vectorization = params['vectorization'] if 'vectorization' in params else vectorization
-        self.evaluation = evaluation
         self.params = params['params'] if 'params' in params else None
         self.data_path = data_path
         
-        # Generate default values
-        self.evaluation_normal_size = 0.2
-        self.evaluation_cross_k = StratifiedKFold(10, True)
-
         # Read dataset and categories
         self.read_dataset()
 
@@ -189,16 +181,7 @@ class Model():
 
     # Generate evaluation depending of type
     def evaluate(self):
-
-        if self.evaluation == const.EVALUATIONS['normal']:
-            return self.normal_evaluate()
-
-        elif self.evaluation == const.EVALUATIONS['cross']:
-            return self.cross_evaluate()
-
-        else:
-            print('ERROR - (MODEL) Test dataset not generated')
-            return None
+        return self.normal_evaluate()
 
     # Generate normal evaluation
     def normal_evaluate(self):
@@ -220,27 +203,6 @@ class Model():
         }
 
         return accuracy, report, report_string, matrix
-
-    # Generate cross evaluation
-    def cross_evaluate(self):
-
-        results = cross_validate(self.classifier, self.dataset, self.categories,
-                                cv=self.evaluation_cross_k, return_train_score=False,
-                                scoring=('f1_micro', 'precision_micro', 'recall_micro', 'accuracy'))
-
-        f1_score_list = results['test_f1_micro']
-        precision_list = results['test_precision_micro']
-        recall_list = results['test_recall_micro']
-        accuracy_list = results['test_accuracy']
-
-        report = {
-            'f1_score': sum(f1_score_list) / len(f1_score_list),
-            'precision': sum(precision_list) / len(precision_list),
-            'recall': sum(recall_list) / len(recall_list),
-        }
-        accuracy = sum(accuracy_list) / len(accuracy_list)
-
-        return accuracy, report, None, None
 
     # Generate parameter space for model
     def grid_search_evaluate(self):

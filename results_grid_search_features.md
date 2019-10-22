@@ -12,8 +12,8 @@ SVC(C=100, cache_size=200, class_weight=None, coef0=0.0,
 (EVALUATOR) Model svm trained
 (EVALUATOR) Model svm evaluated
 
-(EVALUATOR) Evaluation, Accuracy: 0.7884
-(EVALUATOR) Evaluation, Classification Report: 
+(EVALUATOR) , Accuracy: 0.7884
+(EVALUATOR) , Classification Report: 
               precision    recall  f1-score   support
 
            0       0.78      0.95      0.86      3312
@@ -24,7 +24,7 @@ SVC(C=100, cache_size=200, class_weight=None, coef0=0.0,
 weighted avg       0.80      0.79      0.77      5000
 
 
-(EVALUATOR) Evaluation, Confusion Matrix: 
+(EVALUATOR) , Confusion Matrix: 
 [[3152  160]
  [ 898  790]]
 
@@ -45,8 +45,8 @@ DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=8,
 (EVALUATOR) Model tree trained
 (EVALUATOR) Model tree evaluated
 
-(EVALUATOR) Evaluation, Accuracy: 0.7904
-(EVALUATOR) Evaluation, Classification Report: 
+(EVALUATOR) , Accuracy: 0.7904
+(EVALUATOR) , Classification Report: 
               precision    recall  f1-score   support
 
            0       0.78      0.94      0.86      3312
@@ -57,7 +57,7 @@ DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=8,
 weighted avg       0.79      0.79      0.77      5000
 
 
-(EVALUATOR) Evaluation, Confusion Matrix: 
+(EVALUATOR) , Confusion Matrix: 
 [[3126  186]
  [ 862  826]]
 
@@ -79,8 +79,8 @@ MultinomialNB(alpha=2.0, class_prior=None, fit_prior=True)
 (EVALUATOR) Model nb trained
 (EVALUATOR) Model nb evaluated
 
-(EVALUATOR) Evaluation, Accuracy: 0.777
-(EVALUATOR) Evaluation, Classification Report: 
+(EVALUATOR) , Accuracy: 0.777
+(EVALUATOR) , Classification Report: 
               precision    recall  f1-score   support
 
            0       0.76      0.98      0.85      3312
@@ -91,7 +91,7 @@ MultinomialNB(alpha=2.0, class_prior=None, fit_prior=True)
 weighted avg       0.80      0.78      0.75      5000
 
 
-(EVALUATOR) Evaluation, Confusion Matrix: 
+(EVALUATOR) , Confusion Matrix: 
 [[3233   79]
  [1036  652]]
 
@@ -109,8 +109,8 @@ KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='manhattan',
 (EVALUATOR) Model knn trained
 (EVALUATOR) Model knn evaluated
 
-(EVALUATOR) Evaluation, Accuracy: 0.7776
-(EVALUATOR) Evaluation, Classification Report: 
+(EVALUATOR) , Accuracy: 0.7776
+(EVALUATOR) , Classification Report: 
               precision    recall  f1-score   support
 
            0       0.78      0.92      0.85      3312
@@ -121,7 +121,7 @@ KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='manhattan',
 weighted avg       0.77      0.78      0.76      5000
 
 
-(EVALUATOR) Evaluation, Confusion Matrix: 
+(EVALUATOR) , Confusion Matrix: 
 [[3037  275]
  [ 837  851]]
 
@@ -143,8 +143,8 @@ MLPClassifier(activation='relu', alpha=0.0001, batch_size='auto', beta_1=0.9,
 (EVALUATOR) Model mlp_classifier trained
 (EVALUATOR) Model mlp_classifier evaluated
 
-(EVALUATOR) Evaluation, Accuracy: 0.7942
-(EVALUATOR) Evaluation, Classification Report: 
+(EVALUATOR) , Accuracy: 0.7942
+(EVALUATOR) , Classification Report: 
               precision    recall  f1-score   support
 
            0       0.78      0.95      0.86      3312
@@ -155,6 +155,6 @@ MLPClassifier(activation='relu', alpha=0.0001, batch_size='auto', beta_1=0.9,
 weighted avg       0.80      0.79      0.78      5000
 
 
-(EVALUATOR) Evaluation, Confusion Matrix: 
+(EVALUATOR) , Confusion Matrix: 
 [[3155  157]
  [ 872  816]]

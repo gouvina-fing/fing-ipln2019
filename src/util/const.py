@@ -23,9 +23,3 @@ VECTORIZERS = {
     'features': 1,
     'word_embeddings': 2,
 }
-
-EVALUATIONS = {
-    'none': 0,
-    'normal': 1,
-    'cross': 2,
-}
