@@ -30,8 +30,8 @@ best_solution = {
     'params': {
         'activation': 'relu',
         'alpha': 0.0001,
-        'hidden_layer_sizes': (50, 50, 50),
-        'learning_rate': 'constant',
+        'hidden_layer_sizes': (50, 100, 50),
+        'learning_rate': 'adaptive',
         'max_iter': 2000,
         'solver': 'adam'
     }
